@@ -272,7 +272,9 @@ class TestGPyTorchPosterior(BotorchTestCase):
             self.assertEqual(new_posterior.variance.shape, exp_size)
             new_covar_exp = ((covar @ weights) @ weights).unsqueeze(-1)
             self.assertTrue(
-                torch.allclose(new_posterior.variance[..., -1], new_covar_exp)
+                torch.allclose(
+                    new_posterior.variance[..., -1], new_covar_exp, atol=1e-3
+                )
             )
             # test q=2, interleaved
             q = 2

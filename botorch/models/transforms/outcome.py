@@ -220,8 +220,8 @@ class Standardize(OutcomeTransform):
         """
         super().__init__()
         self.register_buffer("means", torch.zeros(*batch_shape, 1, m))
-        self.register_buffer("stdvs", torch.zeros(*batch_shape, 1, m))
-        self.register_buffer("_stdvs_sq", torch.zeros(*batch_shape, 1, m))
+        self.register_buffer("stdvs", torch.ones(*batch_shape, 1, m))
+        self.register_buffer("_stdvs_sq", torch.ones(*batch_shape, 1, m))
         self._outputs = normalize_indices(outputs, d=m)
         self._m = m
         self._batch_shape = batch_shape
@@ -247,6 +247,8 @@ class Standardize(OutcomeTransform):
             - The transformed outcome observations.
             - The transformed observation noise (if applicable).
         """
+        if Y.numel() == 0:
+            return Y, Yvar
         if self.training:
             if Y.shape[:-2] != self._batch_shape:
                 raise RuntimeError("wrong batch shape")

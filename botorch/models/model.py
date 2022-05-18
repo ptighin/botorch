@@ -194,6 +194,8 @@ class Model(Module, ABC):
         Returns:
             A tensor of transformed inputs
         """
+        if X is None or X.numel() == 0:
+            return X
         if input_transform is not None:
             input_transform.to(X)
             return input_transform(X)

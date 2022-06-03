@@ -385,9 +385,18 @@ class TestSingleTaskGP(BotorchTestCase):
         if self.model_class is not SingleTaskGP:
             kwargs["train_Yvar"] = empty_inputs
         model = self.model_class(**kwargs)
-        posterior = model.posterior(torch.rand(3, 4, 2))
+        X_prediction = torch.rand(3, 4, 2)
+        with torch.no_grad():
+            posterior = model.posterior(X_prediction)
         samples = posterior.rsample(sample_shape=torch.Size([5]))
         self.assertEqual(samples.shape, torch.Size([5, 3, 4, 2]))
+
+        expected_mean = torch.zeros_like(posterior.mean)
+        expected_var = torch.full_like(
+            posterior.variance, fill_value=model.covar_module.outputscale[0].detach()
+        )
+        assert torch.equal(posterior.mean, expected_mean)
+        assert torch.equal(posterior.variance, expected_var)
 
 
 class TestFixedNoiseGP(TestSingleTaskGP):

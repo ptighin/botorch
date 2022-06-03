@@ -93,6 +93,10 @@ class SingleTaskGP(BatchedMultiOutputGPyTorchModel, ExactGP):
             >>> train_Y = torch.sin(train_X).sum(dim=1, keepdim=True)
             >>> model = SingleTaskGP(train_X, train_Y)
         """
+        # If input is empty, do not use transforms
+        if train_Y.nelement() == 0:
+            input_transform = None
+            outcome_transform = None
         with torch.no_grad():
             transformed_X = self.transform_inputs(
                 X=train_X, input_transform=input_transform
@@ -203,6 +207,10 @@ class FixedNoiseGP(BatchedMultiOutputGPyTorchModel, ExactGP):
             >>> train_Yvar = torch.full_like(train_Y, 0.2)
             >>> model = FixedNoiseGP(train_X, train_Y, train_Yvar)
         """
+        # If input is empty, do not use transforms
+        if train_Y.nelement() == 0:
+            input_transform = None
+            outcome_transform = None
         with torch.no_grad():
             transformed_X = self.transform_inputs(
                 X=train_X, input_transform=input_transform
